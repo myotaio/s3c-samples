@@ -13,7 +13,7 @@ The Myota Console is an additional SaaS offering that makes the administration o
 * A CLI to simply S3C configuration.
 * Myota Client management to provide all of the Myota protections for your Windows, macOS and VDI devices.
 
-[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below will specify whether they are applicable to S3C Standalone or with Console Support.
+[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are applicable to S3C Standalone without Console Support.
 
 
 ## How to Deploy Myota S3C
@@ -41,7 +41,7 @@ Myota S3C currently only supports AWS AMI deployments. Instructions for addition
 The AMI comes with an initialization script at `/var/lib/myota/config/init.sh` that can either be run interactively with user prompts for each value or in an unattended mode that is suitable as part of a [user data script](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html). The script takes the following parameters:
 |Parameter|Description|
 |---|---|
-|appName|Application name that will be used as the bucket name|
+|appName|Application name that will be used as the **bucket name**|
 |ssmPrefix|Prefix to apply to all SSM parameters to avoid naming collisions|
 |namePrefix|Prefix to apply to all created AWS resources (IAM users, roles, S3 buckets, etc)|
 |nameSuffix|Suffix to apply to all created AWS resources (IAM users, roles, S3 buckets, etc)|
@@ -49,30 +49,16 @@ The AMI comes with an initialization script at `/var/lib/myota/config/init.sh` t
 |createBuckets|yes/no whether script should create the storage buckets|
 |unattended|flag to suppress prompts to run unattended|
 
+The S3C instance also needs to know what domain(s) it is running under since that can't be determined progammatically. The domain can be FQDN and/or an IP address. These get added as comma separated values to the `s3domains` variable in `/var/lib/myota/myota.params`.
+
 Example usage:
 ```Bash
-$> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended 2>&1
+$> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended
+
+$> echo "export s3domains=mys3c.myota.cloud,127.0.0.1" >> /var/lib/myota/myota.params
 ```
+
 The default access key and secret will be found in the SSM Parameter Store under `$ssmPrefix/$appName/api/v1/storapp/$appName/role/config`. So for the example command above it would be under `/myota/s3c/gallery/api/v1/storapp/gallery/role/config`.
-
-### With Console Support
-
-```Bash
-$> cd /var/lib/myota
-$> ./myota-s3c-cli --server https://CONSOLE_API_ADDRESS
-```
-
-```Myota_CLI
-> login YOUR_ACCESS_KEY YOUR_ACCESS_SECRET
-> create-storage-app app=gallery-demo folder=/gallery-demo storage-pool='1' device-group='2'
-create-storage-app result={"appName":"gallery-demo","folderName":"gallery-demo","repoURI":"tag:myota.io,2019:repo/1/f3886505-a56f-4f21-882c-XXXXXXXXXXXX","storagePoolId":"1"}
-
-> print-var createdApps
-print-var result={"gallery-demo":{"appName":"gallery-demo","credentials":{"id":"2t9mXXXXXXXXXXXXXXXXXXXXXX","secret":"1ut6XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"},"deviceId":"ee682b2d-b8fc-42ab-9f2d-XXXXXXXXXXXX","deviceKey":"ca002d87-e201-49cf-a8dc-XXXXXXXXXXXX","repoURI":"tag:myota.io,2019:repo/1/f3886505-a56f-4f21-882c-XXXXXXXXXXXX"}}
-
-> list-storage-app-role gallery-demo
-list-storage-app-role result={"applications":[{"appName":"gallery-demo","roles":[{"accessKey":"GVBDXXXXXXXXXXXXXXX","role":"Default","secret":"hWgeXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"}]}]}
-```
 
 
 ## How to Use Myota S3C
