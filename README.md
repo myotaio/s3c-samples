@@ -21,9 +21,15 @@ The Myota Console is an additional SaaS offering that makes the administration o
 ### AWS Marketplace
 In the AWS Console navigate to the AMI Catalog under EC2 and search for "Myota S3C". This will find the latest release of the product. Once found click "Select" and "Launch instance with AMI" to provision the EC2 instance as you normally would.
 
-The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM role" under "Step 3: Configure Instance Details".
+The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy.
 
-The Myota S3C utilizes the following ports. So they should be included in the security group associated with the instance.
+Since the init script uses the AWS CLI to create the resources, the EC2 instance requires access to the following services either by being in a public subnet or having access to a NAT gateway/instance with proper route tables.
+* SSM
+* KMS
+* IAM
+* S3
+
+The Myota S3C utilizes the following ports. So they should be included in the security group associated with the instance. Depending on how you launch your EC2 instance these ports may be included by default.
 |Port|Usage|
 |---|---|
 |9986|S3C API via HTTP|
