@@ -10,10 +10,10 @@ The Myota Console is an additional SaaS offering that makes the administration o
 * The ability to seemless migrate between storage providers to avoid vendor lock-in with no downtime.
 * Automatic storage repair should a node lose data, become corrupt or go offline for an extended period.
 * Dashboards to monitor performance, storage alerts and track usage trends.
-* A CLI to simply S3C configuration.
+* A command-line interface (CLI) to simplify remote S3C configuration.
 * Myota Client management to provide all of the Myota protections for your Windows, macOS and VDI devices.
 
-[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are applicable to S3C Standalone without Console Support.
+[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are only applicable to S3C Standalone without Console Support.
 
 
 ## How to Deploy Myota S3C
@@ -21,7 +21,8 @@ The Myota Console is an additional SaaS offering that makes the administration o
 ### AWS Marketplace
 In the AWS Console navigate to the AMI Catalog under EC2 and search for "Myota S3C". This will find the latest release of the product. Once found click "Select" and "Launch instance with AMI" to provision the EC2 instance as you normally would.
 
-The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy.
+The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy. See [IAM roles for Amazon EC2
+](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html) for more details.
 
 Since the init script uses the AWS CLI to create the resources, the EC2 instance requires access to the following services either by being in a public subnet or having access to a NAT gateway/instance with proper route tables.
 * SSM
@@ -33,7 +34,7 @@ The Myota S3C utilizes the following ports. So they should be included in the se
 |Port|Usage|
 |---|---|
 |9986|S3C API via HTTP|
-|9987|S3C API via HTTPS|
+|9987|S3C API via HTTPS (optional)|
 |5899|S3C API via Webdav (optional)|
 |22|SSH (optional after setup)|
 
@@ -51,17 +52,14 @@ The AMI comes with an initialization script at `/var/lib/myota/config/init.sh` t
 |ssmPrefix|Prefix to apply to all SSM parameters to avoid naming collisions|
 |namePrefix|Prefix to apply to all created AWS resources (IAM users, roles, S3 buckets, etc)|
 |nameSuffix|Suffix to apply to all created AWS resources (IAM users, roles, S3 buckets, etc)|
+|domains|Comma separated list of FQDNs and/or IP addresses that the service will be listening on|
 |regions|Comma separated list of four regions to create buckets in. Duplicate regions are allowed but not recommended|
-|createBuckets|yes/no whether script should create the storage buckets|
-|unattended|flag to suppress prompts to run unattended|
-
-The S3C instance also needs to know what domain(s) it is running under since that can't be determined progammatically. The domain can be FQDN and/or an IP address. These get added as comma separated values to the `s3domains` variable in `/var/lib/myota/myota.params`.
+|createBuckets|Boolean "yes" or "no" whether script should create the storage buckets|
+|unattended|Flag to suppress prompts during unattended executions|
 
 Example usage:
 ```Bash
-$> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended
-
-$> echo "export s3domains=mys3c.myota.cloud,127.0.0.1" >> /var/lib/myota/myota.params
+$> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --domains mys3c.myota.cloud,127.0.0.1 --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended
 ```
 
 The default access key and secret will be found in the SSM Parameter Store under `$ssmPrefix/$appName/api/v1/storapp/$appName/role/config`. So for the example command above it would be under `/myota/s3c/gallery/api/v1/storapp/gallery/role/config`.
@@ -72,12 +70,12 @@ Typically the only change that has to be made to switch from using a standard S3
 
 ### Credentials
 
-Add your credentials at ~/.aws/credentials
+Your credentials can either be included as environment variables or added as part of an AWS profile. See CLI section below for command line examples. Alternatively add your credentials at ~/.aws/credentials like:
 
 ```AWS
 [myota-s3c]
-aws_access_key_id=W1****
-aws_secret_access_key=5F**
+aws_access_key_id=MY*****
+aws_secret_access_key=*******
 ```
 Code your application using AWS SDK (e.g. Python Boto3)
 
@@ -116,7 +114,12 @@ $> AWS_PROFILE=myota-s3c python3 your_script.py
 ### Using AWS CLI
 
 ```Bash
+$> AWS_ACCESS_KEY_ID=MY***** AWS_SECRET_ACCESS_KEY=******* aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
+
+ - or -
+
 $> AWS_PROFILE=myota-s3c aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
+
 {
     "Contents": [
         {
