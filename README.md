@@ -3,6 +3,9 @@ Myota secures unstructured data through a dynamic object storage interface that 
 
 Myota S3C runs as a server agent to replace your standard S3 bucket usage. Any of your current S3 workloads that support [endpoint URLs](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html) are candidates to be replaced with Myota S3C. Check out our [web site](https://www.myota.io/myota-methodology/secure-data-storage-s3-buckets) for more details.
 
+Check the [Myota Support Portal](https://myota.io/support) for additional FAQs or to get any additional assistance.
+
+---
 
 ## Myota Console
 The Myota Console is an additional SaaS offering that makes the administration of Myota S3C and all other Myota products much easier. It is a web based portal that adds the following features:
@@ -15,6 +18,7 @@ The Myota Console is an additional SaaS offering that makes the administration o
 
 [Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are only applicable to S3C Standalone without Console Support.
 
+---
 
 ## How to Deploy Myota S3C
 
@@ -41,6 +45,7 @@ The Myota S3C utilizes the following ports. So they should be included in the se
 ### Other Providers
 Myota S3C currently only supports AWS AMI deployments. Instructions for additional deployment scenarios such as Microsoft Azure, Google Cloud Platform, Linode and on-premise will be published soon!
 
+---
 
 ## Myota Bucket Configuration
 
@@ -64,6 +69,7 @@ $> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c -
 
 The default access key and secret will be found in the SSM Parameter Store under `$ssmPrefix/$appName/api/v1/storapp/$appName/role/config`. So for the example command above it would be under `/myota/s3c/gallery/api/v1/storapp/gallery/role/config`.
 
+---
 
 ## How to Use Myota S3C
 Typically the only change that has to be made to switch from using a standard S3 bucket to Myota S3C is to update your credentials and provide the endpoint URL of your S3C instance. Here are some examples using the Boto3 Python SDK and the AWS CLI. Other client APIs would require similar change but will vary slightly by language or product. See our [gallery demo](./samples/gallery-demo/) for a fully functioning example with S3 and S3C working side by side.
@@ -136,3 +142,8 @@ $> AWS_PROFILE=myota-s3c aws s3api list-objects --bucket demo-a791a751 --endpoin
     ]
 }
 ```
+
+---
+
+## Upgrades
+Myota will periodically release new versions of the S3C AMI. These new releases may include new features, performance improvements, bug fixes and/or OS security patches. AWS will notify all current S3C AMI customers when a new version is available. Prior versions will continue to be supported for no less than 90 days. In place upgrades are not currently supported. To upgrade to the latest AMI you simply have to launch a new EC2 instance with the same initialization parameters that were used previously. The same process can be used to launch multiple instances for high availability scenarios.
