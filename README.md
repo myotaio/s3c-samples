@@ -53,6 +53,7 @@ Myota S3C currently only supports AWS AMI deployments. Instructions for addition
 The AMI comes with an initialization script at `/var/lib/myota/config/init.sh` that can either be run interactively with user prompts for each value or in an unattended mode that is suitable as part of a [user data script](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html). The script takes the following parameters:
 |Parameter|Description|
 |---|---|
+|email|Valid email address for product support registration. See [Privacy Policy](https://www.myota.io/privacy-policy).|
 |appName|Application name that will be used as the **bucket name**|
 |ssmPrefix|Prefix to apply to all SSM parameters to avoid naming collisions|
 |namePrefix|Prefix to apply to all created AWS resources (IAM users, roles, S3 buckets, etc)|
@@ -64,7 +65,7 @@ The AMI comes with an initialization script at `/var/lib/myota/config/init.sh` t
 
 Example usage:
 ```Bash
-$> /var/lib/myota/config/init.sh --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --domains mys3c.myota.cloud,127.0.0.1 --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended
+$> /var/lib/myota/config/init.sh --email jane.doe@myota.com --appName gallery-demo --ssmPrefix /myota/s3c --namePrefix myota-s3c --nameSuffix gallery --domains mys3c.myota.cloud,127.0.0.1 --regions us-east-1,us-east-2,us-west-1,us-west-2 --createBuckets yes --unattended
 ```
 
 The default access key and secret will be found in the SSM Parameter Store under `$ssmPrefix/$appName/api/v1/storapp/$appName/role/config`. So for the example command above it would be under `/myota/s3c/gallery/api/v1/storapp/gallery/role/config`.
