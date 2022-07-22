@@ -1,29 +1,29 @@
-# Myota S3-Compatible Interface
-Myota secures unstructured data through a dynamic object storage interface that supports your cloud workloads, including applications, webpages and hyperconverged infrastructure. Our storage solution is compatible with S3 buckets, easy to configure and ideal for building modern applications that require scale and flexibility, as well as importing existing data for backup or archive.
+# Myota Cyberstorage
+Myota secures unstructured data through a dynamic object storage interface that supports your cloud workloads, including applications, webpages and hyperconverged infrastructure. Our storage solution uses an Amazon S3-compatible (S3C) interface that is easy to configure and ideal for building modern applications that require scale and flexibility, as well as importing existing data for backup or archive.
 
-Myota S3C runs as a server agent to replace your standard S3 bucket usage. Any of your current S3 workloads that support [endpoint URLs](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html) are candidates to be replaced with Myota S3C. Check out our [web site](https://www.myota.io/myota-methodology/secure-data-storage-s3-buckets) for more details.
+Myota Cyberstorage runs as a server agent to replace your standard S3 bucket usage. Any of your current S3 workloads that support [endpoint URLs](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/index.html) are candidates to be replaced with Myota Cyberstorage. Check out our [web site](https://www.myota.io/myota-methodology/secure-data-storage-s3-buckets) for more details.
 
 Check the [Myota Support Portal](https://myota.io/support) for additional FAQs or to get any additional assistance.
 
 ---
 
 ## Myota Console
-The Myota Console is an additional SaaS offering that makes the administration of Myota S3C and all other Myota products much easier. It is a web based portal that adds the following features:
+The Myota Console is an additional SaaS offering that makes the administration of Myota Cyberstorage and all other Myota products much easier. It is a web based portal that adds the following features:
 * Support for additional non-S3 storage nodes such as Azure Blob Storage, Google Cloud Storage, MinIO and on-premise servers.
 * The ability to seemless migrate between storage providers to avoid vendor lock-in with no downtime.
 * Automatic storage repair should a node lose data, become corrupt or go offline for an extended period.
 * Dashboards to monitor performance, storage alerts and track usage trends.
-* A command-line interface (CLI) to simplify remote S3C configuration.
+* A command-line interface (CLI) to simplify remote Myota configuration.
 * Myota Client management to provide all of the Myota protections for your Windows, macOS and VDI devices.
 
-[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are only applicable to S3C Standalone without Console Support.
+[Contact Myota](https://www.myota.io/contact) to learn more about getting the Myota Console. Instructions below are only applicable to Myota Standalone without Console Support.
 
 ---
 
-## How to Deploy Myota S3C
+## How to Deploy Myota Cyberstorage
 
 ### AWS Marketplace
-In the AWS Console navigate to the AMI Catalog under EC2 and search for "Myota S3C". This will find the latest release of the product. Once found click "Select" and "Launch instance with AMI" to provision the EC2 instance as you normally would.
+In the AWS Console navigate to the AMI Catalog under EC2 and search for "Myota". This will return the latest release of the product. Once found click "Select" and "Launch instance with AMI" to provision the EC2 instance as you normally would.
 
 The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy. See [IAM roles for Amazon EC2
 ](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html) for more details.
@@ -34,7 +34,7 @@ Since the init script uses the AWS CLI to create the resources, the EC2 instance
 * IAM
 * S3
 
-The Myota S3C utilizes the following ports. So they should be included in the security group associated with the instance. Depending on how you launch your EC2 instance these ports may be included by default.
+The Myota Cyberstorage utilizes the following ports. So they should be included in the security group associated with the instance. Depending on how you launch your EC2 instance these ports may be included by default.
 |Port|Usage|
 |---|---|
 |9986|S3C API via HTTP|
@@ -43,7 +43,7 @@ The Myota S3C utilizes the following ports. So they should be included in the se
 |22|SSH (optional after setup)|
 
 ### Other Providers
-Myota S3C currently only supports AWS AMI deployments. Instructions for additional deployment scenarios such as Microsoft Azure, Google Cloud Platform, Linode and on-premise will be published soon!
+Myota Cyberstorage currently only supports AWS AMI deployments. Instructions for additional deployment scenarios such as Microsoft Azure, Google Cloud Platform, Linode and on-premise will be published soon!
 
 ---
 
@@ -72,8 +72,8 @@ The default access key and secret will be found in the SSM Parameter Store under
 
 ---
 
-## How to Use Myota S3C
-Typically the only change that has to be made to switch from using a standard S3 bucket to Myota S3C is to update your credentials and provide the endpoint URL of your S3C instance. Here are some examples using the Boto3 Python SDK and the AWS CLI. Other client APIs would require similar change but will vary slightly by language or product. See our [gallery demo](./samples/gallery-demo/) for a fully functioning example with S3 and S3C working side by side.
+## How to Use Myota Cyberstorage
+Typically the only change that has to be made to switch from using a standard S3 bucket to Myota Cyberstorage is to update your credentials and provide the endpoint URL of your S3C instance. Here are some examples using the Boto3 Python SDK and the AWS CLI. Other client APIs would require similar change but will vary slightly by language or product. See our [gallery demo](./samples/gallery-demo/) for a fully functioning example with S3 and S3C working side by side.
 
 ### Credentials
 
