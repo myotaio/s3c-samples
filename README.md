@@ -25,7 +25,7 @@ The Myota Console is an additional SaaS offering that makes the administration o
 ### AWS Marketplace
 In the AWS Console navigate to the AMI Catalog under EC2 and search for "Myota". This will return the latest release of the product. Once found click "Select" and "Launch instance with AMI" to provision the EC2 instance as you normally would.
 
-The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy. See [IAM roles for Amazon EC2
+The AMI provides a script under `/var/lib/myota/config/init.sh` to make the creation of the required S3 buckets and associated IAM users and roles easier. However the EC2 instance will require elevated permissions to create all of these. See [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) for the permissions that will be required. Please note the `YOUR_REGION`, `YOUR_ACCOUNT` and `YOUR_SSM_PREFIX` will have to be changed to match your environment. These can be applied to your instance by clicking "Create new IAM profile" under "Advanced details" in the new AWS console experience or by clicking "Create new IAM role" under "Step 3: Configure Instance Details" in the old AWS console experience. In both cases EC2 would be the trusted service and the modified [instance-iam-role.json](./aws-ami-config/instance-iam-role.json) would be applied as its policy. See [IAM roles for Amazon EC2
 ](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html) for more details.
 
 Since the init script uses the AWS CLI to create the resources, the EC2 instance requires access to the following services either by being in a public subnet or having access to a NAT gateway/instance with proper route tables.
@@ -84,7 +84,33 @@ Your credentials can either be included as environment variables or added as par
 aws_access_key_id=MY*****
 aws_secret_access_key=*******
 ```
-Code your application using AWS SDK (e.g. Python Boto3)
+Code your application using the AWS CLI or SDK (e.g. Python Boto3)
+
+### Using AWS CLI
+
+```Bash
+$> AWS_ACCESS_KEY_ID=MY***** AWS_SECRET_ACCESS_KEY=******* aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
+
+ - or -
+
+$> AWS_PROFILE=myota-s3c aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
+
+{
+    "Contents": [
+        {
+            "Key": "hello-myota.txt",
+            "LastModified": "2022-05-04T00:01:45.538000+00:00",
+            "ETag": "\"m69009402066f8019f1349ec006cfb50\"",
+            "Size": 29,
+            "StorageClass": "STANDARD",
+            "Owner": {
+                "DisplayName": "",
+                "ID": ""
+            }
+        }
+    ]
+}
+```
 
 ### Using SDK
 
@@ -116,32 +142,6 @@ Run Python
 
 ```Bash
 $> AWS_PROFILE=myota-s3c python3 your_script.py
-```
-
-### Using AWS CLI
-
-```Bash
-$> AWS_ACCESS_KEY_ID=MY***** AWS_SECRET_ACCESS_KEY=******* aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
-
- - or -
-
-$> AWS_PROFILE=myota-s3c aws s3api list-objects --bucket demo-a791a751 --endpoint-url YOUR_ENDPOINT_URL
-
-{
-    "Contents": [
-        {
-            "Key": "hello-myota.txt",
-            "LastModified": "2022-05-04T00:01:45.538000+00:00",
-            "ETag": "\"m69009402066f8019f1349ec006cfb50\"",
-            "Size": 29,
-            "StorageClass": "STANDARD",
-            "Owner": {
-                "DisplayName": "",
-                "ID": ""
-            }
-        }
-    ]
-}
 ```
 
 ---
